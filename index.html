@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Night Sky Poetry</title>
+
+    <style>
+      /* ======== Base Styles ======== */
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: radial-gradient(circle, #1a237e, #000000);
+        font-family: "Times New Roman", serif;
+      }
+
+      canvas {
+        display: block;
+      }
+
+      /* ======== Opening Section ======== */
+      .opening {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        text-align: center;
+        font-size: 32px;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      }
+
+      .start-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 18px;
+        color: white;
+        background-color: #3f51b5;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      .start-button:hover {
+        background-color: #5c6bc0;
+      }
+
+      .character {
+        width: 150px;
+        height: auto;
+        margin-top: 20px;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      /* ======== Poetry Section ======== */
+      .poetry {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        text-align: center;
+        font-size: 24px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        white-space: pre-wrap;
+        display: none;
+      }
+
+      /* ======== Closing Section ======== */
+      .closing {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        display: none;
+        animation: fadeInOut 10s forwards;
+      }
+
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+        }
+        20%,
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .glitch {
+        font-size: 48px;
+        color: white;
+        position: relative;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        animation: glitch 1s infinite;
+      }
+
+      .glitch::before,
+      .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: white;
+        background: black;
+        overflow: hidden;
+        clip: rect(0, 900px, 0, 0);
+      }
+
+      .glitch::before {
+        animation: glitchTop 1s infinite;
+      }
+
+      .glitch::after {
+        animation: glitchBottom 1s infinite;
+      }
+
+      @keyframes glitch {
+        0%,
+        100% {
+          transform: translate(0);
+        }
+        20% {
+          transform: translate(-2px, 2px);
+        }
+        40% {
+          transform: translate(2px, -2px);
+        }
+        60% {
+          transform: translate(-2px, -2px);
+        }
+        80% {
+          transform: translate(2px, 2px);
+        }
+      }
+
+      @keyframes glitchTop {
+        0%,
+        100% {
+          clip: rect(0, 900px, 0, 0);
+        }
+        50% {
+          clip: rect(10px, 900px, 50px, 0);
+        }
+      }
+
+      @keyframes glitchBottom {
+        0%,
+        100% {
+          clip: rect(0, 900px, 0, 0);
+        }
+        50% {
+          clip: rect(60px, 900px, 100px, 0);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ===== Opening Section ===== -->
+    <div class="opening" id="opening">
+      I HAVE SOMETHING FOR YOU!!!
+      <br />
+      <img src="gif gemoy.gif" alt="Cute Cartoon Hugging" class="character" />
+      <br />
+      <button class="start-button" id="startButton">Click Here Baby</button>
+    </div>
+
+    <!-- ===== Poetry Section ===== -->
+    <div class="poetry" id="poetry"></div>
+
+    <!-- ===== Closing Section ===== -->
+    <div class="closing" id="closing">
+      <h1 class="glitch" data-text="ERROR">ERROR</h1>
+      <p class="glitch" data-text="Something went wrong...">
+        Something went wrong...
+      </p>
+    </div>
+
+    <!-- ===== Background Canvas ===== -->
+    <canvas id="nightSkyCanvas"></canvas>
+
+    <!-- ===== Sounds ===== -->
+    <audio
+      id="keyboardSound"
+      src="keyboard-typing-sound-effect-335503.mp3"></audio>
+     <audio
+      id="musicSound"
+      src="tiktok.mp3"></audio>
+    <audio
+      id="errorSound"
+      src="machine-error-by-prettysleepy-art-12669.mp3"></audio>
+
+    <!-- ===== Script Section ===== -->
+    <script>
+      const canvas = document.getElementById("nightSkyCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const stars = [];
+      const starCount = 100;
+
+      for (let i = 0; i < starCount; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 2 + 1,
+          speed: Math.random() * 0.5 + 0.2,
+          opacity: Math.random() * 0.5 + 0.5,
+          flickerSpeed: Math.random() * 0.02 + 0.01,
+        });
+      }
+
+      function drawStar(star) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawMoon() {
+        const moonX = canvas.width - 150;
+        const moonY = 150;
+        const moonRadius = 80;
+        ctx.fillStyle = "rgba(255, 255, 200, 0.9)";
+        ctx.beginPath();
+        ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.beginPath();
+        ctx.arc(moonX - 20, moonY - 10, moonRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawMoon();
+        stars.forEach((star) => {
+          drawStar(star);
+          star.opacity += star.flickerSpeed;
+          if (star.opacity >= 1 || star.opacity <= 0.5) {
+            star.flickerSpeed *= -1;
+          }
+          star.y += star.speed;
+          if (star.y > canvas.height) {
+            star.y = -star.radius;
+            star.x = Math.random() * canvas.width;
+          }
+        });
+        requestAnimationFrame(animate);
+      }
+
+      // Elemen audio
+      const keyboardSound = document.getElementById("keyboardSound");
+      const musicSound = document.getElementById("musicSound");
+      const errorSound = document.getElementById("errorSound");
+
+      // Tombol klik
+      document.getElementById("startButton").addEventListener("click", () => {
+        document.getElementById("opening").style.display = "none";
+        document.getElementById("poetry").style.display = "block";
+        animate();
+
+        // Putar suara keyboard (sekali, atau bisa di-set loop = true jika ingin terus menerus)
+        keyboardSound.currentTime = 0;
+        keyboardSound.volume = 1;
+        
+        keyboardSound&&musicSound
+          .play()
+          .catch((e) => console.error("Error playing keyboard sound:", e));
+
+        // Jalankan efek ketik
+        typePoetry();
+      });
+
+      function showClosing() {
+        document.getElementById("poetry").style.display = "none";
+        document.getElementById("closing").style.display = "block";
+
+        // Stop suara keyboard
+        
+        keyboardSound.pause();
+        musicSound.pause();
+        keyboardSound.currentTime = 0;
+
+
+        // Mainkan suara error
+        errorSound.currentTime = 0;
+        errorSound.volume = 1;
+        errorSound
+          .play()
+          .catch((e) => console.error("Error playing machine sound:", e));
+      }
+
+      const poetryElement = document.getElementById("poetry");
+      const poetryText = `You are the ache I would choose a thousand times
+    The weight of joy I'll carry forever
+    You are the story I've been waiting to write
+    but never knew how to end.`;
+
+      let index = 0;
+
+      function typePoetry() {
+        if (index < poetryText.length) {
+          poetryElement.textContent += poetryText[index];
+          index++;
+          setTimeout(typePoetry, 100);
+        } else {
+          setTimeout(showClosing, 1000); // Tampilkan ERROR 1 detik setelah selesai ketik
+        }
+      }
+    </script>
+  </body>
+</html>
